@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine</title>
+
+<style>
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #ff9ec4, #ffe6eb, #ffb6d9, #ffd6e8);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  z-index: 2;
+}
+
+.buttons {
+  display: flex;
+  gap: 50px;
+}
+
+.question {
+  font-size: 28px;
+  font-weight: bold;
+  color: #8b004b;
+  text-shadow: 0 0 10px #ff69b4;
+}
+
+button {
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+#yes {
+  border: 2px solid #ff0080;
+  background: transparent;
+  color: #ff0080;
+  box-shadow: 0 0 8px #ff0080;
+}
+
+#yes:hover {
+  background: #ff0080;
+  color: white;
+  box-shadow: 0 0 15px #ff0080, 0 0 25px #8000ff;
+}
+
+#no {
+  background: #ffc0cb;
+  border: 2px solid #ff1493;
+  color: #8b004b;
+  box-shadow: 0 0 10px #ff1493;
+}
+
+#message {
+  position: absolute;
+  font-size: 64px;
+  font-weight: bold;
+  color: #ff4da6;
+  display: none;
+  z-index: 3;
+  text-align: center;
+
+  text-shadow:
+    -2px -2px 0 #ff1493,
+    2px -2px 0 #ff1493,
+    -2px 2px 0 #ff1493,
+    2px 2px 0 #ff1493,
+    0 0 20px #ff1493,
+    0 0 40px #ff69b4,
+    0 0 60px #ff1493;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="message">I knew you'd say YES 💖</div>
+
+<div class="container">
+  <div class="question">Will you be mine forever?</div>
+  <div class="buttons">
+    <button id="yes">YES 💖</button>
+    <button id="no">NO 💔</button>
+  </div>
+</div>
+
+<script>
+const no = document.getElementById("no");
+const yes = document.getElementById("yes");
+const container = document.querySelector(".container");
+const message = document.getElementById("message");
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+/* SAFE MOVEMENT ZONE */
+const safeMargin = 80;
+
+let offsetX = 0;
+let offsetY = 0;
+
+const normalSpeed = 14;
+const panicSpeed = 26;
+const dangerRadius = 80;
+const panicRadius = 45;
+
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  repel();
+});
+
+function repel() {
+  const rect = no.getBoundingClientRect();
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const dx = mouseX - centerX;
+  const dy = mouseY - centerY;
+
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  if (distance > dangerRadius) return;
+
+  let speed = distance < panicRadius ? panicSpeed : normalSpeed;
+
+  offsetX -= (dx / distance) * speed;
+  offsetY -= (dy / distance) * speed;
+
+  bounceInsideSafeZone();
+  no.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+}
+
+/* FIXED BOUNDARY LOGIC */
+function bounceInsideSafeZone() {
+  const rect = no.getBoundingClientRect();
+
+  const leftLimit = safeMargin;
+  const rightLimit = window.innerWidth - safeMargin;
+  const topLimit = safeMargin;
+  const bottomLimit = window.innerHeight - safeMargin;
+
+  if (rect.left < leftLimit) {
+    offsetX += (leftLimit - rect.left);
+  }
+
+  if (rect.right > rightLimit) {
+    offsetX -= (rect.right - rightLimit);
+  }
+
+  if (rect.top < topLimit) {
+    offsetY += (topLimit - rect.top);
+  }
+
+  if (rect.bottom > bottomLimit) {
+    offsetY -= (rect.bottom - bottomLimit);
+  }
+}
+
+no.addEventListener("click", (e) => e.preventDefault());
+
+/* YES CLICK */
+yes.addEventListener("click", () => {
+  container.style.display = "none";
+  message.style.display = "block";
+  explodeHearts();
+});
+
+/* HEART EXPLOSION */
+const hearts = [];
+
+function explodeHearts() {
+  for (let i = 0; i < 140; i++) {
+    hearts.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      size: Math.random() * 20 + 10,
+      speedX: (Math.random() - 0.5) * 8,
+      speedY: (Math.random() - 0.5) * 8,
+      color: `hsl(${Math.random() * 360},100%,60%)`
+    });
+  }
+  animateHearts();
+}
+
+function drawHeart(x, y, size, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x-size, y-size, x-size*2, y+size/2, x, y+size*2);
+  ctx.bezierCurveTo(x+size*2, y+size/2, x+size, y-size, x, y);
+  ctx.fill();
+}
+
+function animateHearts() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  hearts.forEach(h => {
+    h.x += h.speedX;
+    h.y += h.speedY;
+    drawHeart(h.x, h.y, h.size, h.color);
+  });
+
+  requestAnimationFrame(animateHearts);
+}
+</script>
+
+</body>
+</html>
