@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine</title>
@@ -12,7 +15,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Baloo 2', cursive;
   overflow: hidden;
   background: linear-gradient(-45deg, #ff9ec4, #ffe6eb, #ffb6d9, #ffd6e8);
   background-size: 400% 400%;
@@ -68,7 +71,7 @@ button {
 }
 
 #no {
-  background: #ffc0cb;
+  background: transparent;
   border: 2px solid #ff1493;
   color: #8b004b;
   box-shadow: 0 0 10px #ff1493;
@@ -76,22 +79,43 @@ button {
 
 #message {
   position: absolute;
-  font-size: 64px;
+  letter-spacing: 3px;
+  font-size: 50px;
   font-weight: bold;
-  color: #ff4da6;
+  color: #DA70D6;
   display: none;
   z-index: 3;
   text-align: center;
+  font-family: 'Luckiest Guy', cursive;
+  animation: glowPulse 1.6s ease-in-out infinite alternate;
 
   text-shadow:
-    -2px -2px 0 #ff1493,
-    2px -2px 0 #ff1493,
-    -2px 2px 0 #ff1493,
-    2px 2px 0 #ff1493,
-    0 0 20px #ff1493,
-    0 0 40px #ff69b4,
-    0 0 60px #ff1493;
+    -4px -4px 0 #9F2B68,
+     4px -4px 0 #9F2B68,
+    -4px  4px 0 #9F2B68,
+     4px  4px 0 #9F2B68,
+     0 6px 10px rgba(0,0,0,0.25);
+     
 }
+
+.bg-heart {
+  position: absolute;
+  font-size: 60px;
+  opacity: 0.25;
+  animation: floatHeart linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes floatHeart {
+  0% {
+    transform: translateY(100vh) translateX(0px);
+  }
+  100% {
+    transform: translateY(-20vh) translateX(80px);
+  }
+}
+
 
 canvas {
   position: absolute;
@@ -99,16 +123,103 @@ canvas {
   left: 0;
   z-index: 1;
 }
+.heart {
+  position: absolute;
+  font-size: 30px;
+  animation: fall linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0.8;
+  animation: sparkleFade 0.8s linear forwards;
+}
+
+@keyframes sparkleFade {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.2) translateY(10px);
+    opacity: 0;
+  }
+}
+.trail-heart {
+  position: absolute;
+  pointer-events: none;
+  font-size: 14px;
+  animation: fadeTrail 0.8s forwards;
+  z-index: 2;
+}
+
+@keyframes fadeTrail {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.5);
+  }
+}
+@keyframes glowPulse {
+  0% {
+    text-shadow:
+      -4px -4px 0 #9F2B68,
+       4px -4px 0 #9F2B68,
+      -4px  4px 0 #9F2B68,
+       4px  4px 0 #9F2B68,
+       0 6px 10px rgba(0,0,0,0.25),
+       0 0 10px #DA70D6;
+  }
+
+  100% {
+    text-shadow:
+      -4px -4px 0 #9F2B68,
+       4px -4px 0 #9F2B68,
+      -4px  4px 0 #9F2B68,
+       4px  4px 0 #9F2B68,
+       0 6px 10px rgba(0,0,0,0.25),
+       0 0 25px #DA70D6,
+       0 0 45px #ff69b4;
+  }
+}
+
+
 </style>
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
 
-<div id="message">I knew you'd say YES 💖</div>
+<div id="message">
+I KNEW THAT YOU'D SAY YES SHRITU 
+<br>
+❤️🎉🎊
+<br><br>
+AND ALSO A VERY VERY BOMBASTIC FANTASTIC BIRTHDAY CUTIEE 
+<br>
+💣💥🎂
+</div>
 
 <div class="container">
-  <div class="question">Will you be mine forever?</div>
+  <div class="question">Will you be mine forever Shritu?</div>
   <div class="buttons">
     <button id="yes">YES 💖</button>
     <button id="no">NO 💔</button>
@@ -198,9 +309,13 @@ no.addEventListener("click", (e) => e.preventDefault());
 
 /* YES CLICK */
 yes.addEventListener("click", () => {
+  stopBackgroundHearts();
   container.style.display = "none";
   message.style.display = "block";
+
+  typeMessage();
   explodeHearts();
+  startHeartShower();
 });
 
 /* HEART EXPLOSION */
@@ -240,7 +355,132 @@ function animateHearts() {
 
   requestAnimationFrame(animateHearts);
 }
-</script>
 
+/* TYPING MESSAGE */
+
+const fullMessage = `
+I KNEW THAT YOU'D SAY YES SHRITU 
+❤️🎉🎊
+
+AND ALSO A VERY VERY BOMBASTIC FANTASTIC BIRTHDAY CUTIEE 
+💣💥🎂
+`;
+
+function typeMessage() {
+  message.innerHTML = "";
+  let i = 0;
+
+  function typing() {
+    if (i < fullMessage.length) {
+      if (fullMessage[i] === "\n") {
+        message.innerHTML += "<br>";
+      } else {
+        message.innerHTML += fullMessage[i];
+      }
+      i++;
+      setTimeout(typing, 100);
+    }
+  }
+
+  typing();
+}
+
+
+/* HEART SHOWER */
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.textContent = Math.random() > 0.5 ? "💖" : "💝";
+
+  document.body.appendChild(heart);
+
+  const startPos = Math.random() * window.innerWidth;
+  const duration = Math.random() * 5 + 4;
+  const size = Math.random() * 25 + 20;
+
+  heart.style.left = startPos + "px";
+  heart.style.animationDuration = duration + "s";
+  heart.style.top = "-10vh";
+  heart.style.fontSize = size + "px";
+
+  const sparkleInterval = setInterval(() => {
+  const rect = heart.getBoundingClientRect();
+  createSparkle(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }, 120);
+
+  setTimeout(() => {
+    clearInterval(sparkleInterval);
+    heart.remove();
+  }, duration * 1000);
+
+}
+
+function startHeartShower() {
+  setInterval(createHeart, 250);
+}
+
+function createSparkle(x, y) {
+  const sparkle = document.createElement("div");
+  sparkle.classList.add("sparkle");
+  sparkle.textContent = Math.random() > 0.5 ? "✨" : "💖";
+
+  sparkle.style.left = x + "px";
+  sparkle.style.top = y + "px";
+
+  document.body.appendChild(sparkle);
+
+  setTimeout(() => sparkle.remove(), 800);
+}
+/* CURSOR HEART TRAIL */
+
+document.addEventListener("mousemove", (e) => {
+  const heart = document.createElement("div");
+  heart.classList.add("trail-heart");
+  heart.textContent = "💗";
+
+  heart.style.left = e.clientX + "px";
+  heart.style.top = e.clientY + "px";
+
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 800);
+});
+
+let bgInterval;
+
+function createBackgroundHeart() {
+  const heart = document.createElement("div");
+  heart.classList.add("bg-heart");
+  heart.textContent = "💗";
+
+  document.body.appendChild(heart);
+
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.animationDuration = (Math.random() * 12 + 10) + "s";
+  heart.style.fontSize = (Math.random() * 40 + 50) + "px";
+
+  setTimeout(() => heart.remove(), 20000);
+}
+
+function startBackgroundHearts() {
+
+  // Create some hearts immediately
+  for (let i = 0; i < 6; i++) {
+    createBackgroundHeart();
+  }
+
+  // Continue creating hearts normally
+  bgInterval = setInterval(createBackgroundHeart, 900);
+}
+
+
+function stopBackgroundHearts() {
+  clearInterval(bgInterval);
+}
+
+startBackgroundHearts();
+
+
+</script>
 </body>
 </html>
